@@ -34,11 +34,14 @@ class PluginLicensesController extends BaseApiController
      * @param int|null $page
      * @param int|null $perPage
      * @param string|array|null $condition
+     * @param string|null $searchQuery
+     * @param string|null $orderBy
+     * @param string|null $ascending
      * @return Response
      * @throws BadRequestHttpException if the `page` or `perPage` params are set but not integers
      * @throws UnauthorizedHttpException
      */
-    public function actionList($page = null, $perPage = null, $condition = null): Response
+    public function actionList($page = null, $perPage = null, $condition = null, $searchQuery = null, $orderBy = null, $ascending = null): Response
     {
         if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
             throw new UnauthorizedHttpException('Not Authorized');
@@ -54,7 +57,7 @@ class PluginLicensesController extends BaseApiController
         $perPage = $perPage ? (int)$perPage : 100;
 
         list($offset, $limit) = $this->page2offset($page, $perPage);
-        $licenses = $this->module->getPluginLicenseManager()->getLicensesByDeveloper($user->id, $offset, $limit, $total, $condition);
+        $licenses = $this->module->getPluginLicenseManager()->getLicensesByDeveloper($user->id, $offset, $limit, $total, $condition, $searchQuery, $orderBy);
         return $this->asJson([
             'total' => $total,
             'totalPages' => ceil($total / $limit),
