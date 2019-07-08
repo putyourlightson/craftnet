@@ -238,11 +238,13 @@ class PluginLicenseManager extends Component
      * @param int|null $total
      * @param string|null $pluginHandle
      * @param string|null $searchQuery
+     * @param string|null $before
+     * @param string|null $after
      * @param string|null $orderBy
      * @param string|null $ascending
      * @return PluginLicense[]
      */
-    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null, string $pluginHandle = null, string $searchQuery = null, $orderBy = null, $ascending = null): array
+    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null, string $pluginHandle = null, string $searchQuery = null, $before = null, $after = null, $orderBy = null, $ascending = null): array
     {
         $query = $this->_createLicenseQuery()
             ->innerJoin('craftnet_plugins p', '[[p.id]] = [[l.pluginId]]')
@@ -263,6 +265,14 @@ class PluginLicenseManager extends Component
                 ['ilike', 'l.pluginHandle', $searchQuery],
                 ['ilike', 'l.email', $searchQuery],
             ]);
+        }
+        
+        if ($before) {
+            $query->andWhere(['l.dateCreated', $before, '<']);
+        }
+        
+        if ($after) {
+            $query->andWhere(['l.dateCreated', $after, '>=']);
         }
         
         if ($orderBy) {
