@@ -41,7 +41,7 @@ class PluginLicensesController extends BaseApiController
      * @throws BadRequestHttpException if the `page` or `perPage` params are set but not integers
      * @throws UnauthorizedHttpException
      */
-    public function actionList($page = null, $perPage = null, $condition = null, $searchQuery = null, $orderBy = null, $ascending = null): Response
+    public function actionList($page = null, $perPage = null, $condition = null, string $searchQuery = null, $orderBy = null, $ascending = null): Response
     {
         if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
             throw new UnauthorizedHttpException('Not Authorized');
