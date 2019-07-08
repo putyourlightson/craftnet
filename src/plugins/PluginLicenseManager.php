@@ -263,7 +263,7 @@ class PluginLicenseManager extends Component
         }
         
         if ($orderBy) {
-            $query->orderBy([$orderBy => $ascending ? SORT_ASC : SORT_DESC]);
+            $query->orderBy(['l.'.$orderBy => $ascending ? SORT_ASC : SORT_DESC]);
         }
         
         $total = $query->count();
