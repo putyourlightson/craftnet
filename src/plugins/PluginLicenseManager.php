@@ -237,21 +237,37 @@ class PluginLicenseManager extends Component
      * @param int|null $limit
      * @param int|null $total
      * @param string|array|null $condition
+     * @param string|null $searchQuery
+     * @param string|null $orderBy
+     * @param string|null $ascending
      * @return PluginLicense[]
      */
-    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null, $condition = null): array
+    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null, $condition = null, string $searchQuery = null, $orderBy = null, $ascending = null): array
     {
         $query = $this->_createLicenseQuery()
             ->innerJoin('craftnet_plugins p', '[[p.id]] = [[l.pluginId]]')
             ->where(['p.developerId' => $developerId]);
-            ->andWhere($condition);
-
-        $total = $query->count();
-        $results = $query
+            ->andWhere($condition)
             ->offset($offset)
             ->limit($limit)
-            ->orderBy(['l.dateCreated' => SORT_ASC])
-            ->all();
+            ->orderBy(['l.dateCreated' => SORT_ASC]);
+
+        if ($searchQuery) {
+            $query->andWhere([
+                'or',
+                ['ilike', 'l.key', $searchQuery],
+                ['ilike', 'l.notes', $searchQuery],
+                ['ilike', 'l.pluginHandle', $searchQuery],
+                ['ilike', 'l.email', $searchQuery],
+            ]);
+        }
+        
+        if ($orderBy) {
+            $query->orderBy([$orderBy => $ascending ? SORT_ASC : SORT_DESC]);
+        }
+        
+        $total = $query->count();
+        $results = $query->all();
         $licenses = [];
         foreach ($results as $result) {
             $licenses[] = new PluginLicense($result);
